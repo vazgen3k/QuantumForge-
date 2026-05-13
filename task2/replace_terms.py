@@ -27,8 +27,6 @@ def replace_terms(text: str, terms_map: dict[str, str]) -> str:
 
 
 def process_files() -> None:
-    if not SOURCE_DIR.exists():
-        raise FileNotFoundError(f"Папка source не найдена: {SOURCE_DIR}")
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -48,7 +46,6 @@ def process_files() -> None:
 
         print(f"Готово: {source_file.name} -> {output_file}")
 
-    print(f"\nОбработано файлов: {len(txt_files)}")
     print(f"Результат сохранён в папку: {OUTPUT_DIR}")
 
 

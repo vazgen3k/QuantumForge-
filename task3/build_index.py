@@ -71,7 +71,6 @@ def load_and_split_documents() -> list[Document]:
 def create_embedding_model() -> HuggingFaceEmbeddings:
     """
     Создаёт локальную embedding-модель.
-    Эта модель превращает текстовые чанки в числовые векторы.
     """
     return HuggingFaceEmbeddings(
         model_name=MODEL_NAME,
@@ -83,7 +82,6 @@ def create_embedding_model() -> HuggingFaceEmbeddings:
 def save_chunks_debug_file(documents: list[Document]) -> None:
     """
     Сохраняет чанки без эмбеддингов в jsonl.
-    Это нужно для проверки разбиения и для README.
     """
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -95,7 +93,6 @@ def save_chunks_debug_file(documents: list[Document]) -> None:
             }
             file.write(json.dumps(record, ensure_ascii=False) + "\n")
 
-    print(f"Чанки сохранены для проверки: {CHUNKS_PATH}")
 
 
 def check_embeddings(
@@ -118,11 +115,6 @@ def check_embeddings(
     embeddings_count = len(vectors)
     embedding_dimension = len(vectors[0])
 
-    if chunks_count != embeddings_count:
-        raise RuntimeError(
-            f"Количество чанков ({chunks_count}) не совпадает "
-            f"с количеством эмбеддингов ({embeddings_count})"
-        )
 
     info = {
         "embedding_model": MODEL_NAME,
@@ -146,11 +138,6 @@ def build_faiss_index(
 ) -> dict:
     """
     Создаёт FAISS-индекс из чанков и сохраняет его на диск.
-
-    В индекс попадают:
-    - embeddings для каждого чанка;
-    - текст чанка;
-    - metadata чанка.
     """
     start_time = time.time()
 
@@ -184,16 +171,12 @@ def build_faiss_index(
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    print("Загрузка и разбиение документов на чанки...")
     documents = load_and_split_documents()
-    print(f"Количество чанков: {len(documents)}")
 
     save_chunks_debug_file(documents)
 
-    print("Загрузка embedding-модели...")
     embeddings_model = create_embedding_model()
 
-    print("Генерация эмбеддингов...")
     embedding_info = check_embeddings(documents, embeddings_model)
 
     print("\nЭмбеддинги успешно сгенерированы")
